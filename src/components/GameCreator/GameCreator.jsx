@@ -1,23 +1,23 @@
 // src/components/GameCreator/GameCreator.jsx
-import React, { useState } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../../../firebase.config';
-import BasicInfo from './BasicInfo';
-import QuestionsAndAnswers from './QuestionsAndAnswers';
-import GameSettings from './GameSettings';
-import ReviewAndSubmit from './ReviewAndSubmit';
+import React, { useState } from "react";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../../firebase.config";
+import BasicInfo from "./BasicInfo";
+import QuestionsAndAnswers from "./QuestionsAndAnswers";
+import GameSettings from "./GameSettings";
+import ReviewAndSubmit from "./ReviewAndSubmit";
 
 const GameCreator = () => {
   const [step, setStep] = useState(1);
   const [gameData, setGameData] = useState({
-    name: '',
-    type: 'simple',
-    questions: [''],
-    answers: [''],
-    statements: [''],
-    images: [''],
-    imageLabels: [''],
-    options: [''],
+    name: "",
+    type: "simple",
+    questions: [""],
+    answers: [""],
+    statements: [""],
+    images: [""],
+    imageLabels: [""],
+    options: [""],
     maxScore: 10,
     scoreDeduction: 1,
     timePerRound: 60,
@@ -29,31 +29,31 @@ const GameCreator = () => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
-
+  
     if (!gameData.name.trim()) {
       setError('Game name is required');
       return;
     }
-
-    if (gameData.questions.some(q => !q.trim()) || gameData.answers.some(a => !a.trim())) {
-      setError('All questions and answers must be filled');
-      return;
-    }
-
-    if (gameData.type === 'rightAnswer') {
-      const invalidOptions = gameData.options.some(option => {
-        const optionsArray = option.split(',').map(opt => opt.trim());
-        return optionsArray.length < 2;
-      });
-
-      if (invalidOptions) {
-        setError('Right answer games must have at least two options for each question');
+  
+    const cleanedGameData = {
+      ...gameData,
+      statements: gameData.statements.filter(s => s.trim() !== ''),
+      answers: gameData.answers.filter(a => a.trim() !== '')
+    };
+  
+    if (cleanedGameData.type === 'connect') {
+      if (cleanedGameData.statements.length === 0 || cleanedGameData.answers.length === 0) {
+        setError('At least one statement-answer pair is required');
+        return;
+      }
+      if (cleanedGameData.statements.length !== cleanedGameData.answers.length) {
+        setError('Each statement must have a corresponding answer');
         return;
       }
     }
-
+  
     try {
-      await addDoc(collection(db, 'games'), gameData);
+      await addDoc(collection(db, 'games'), cleanedGameData);
       setSuccess(true);
       setGameData({
         name: '',
@@ -70,7 +70,7 @@ const GameCreator = () => {
       });
       setStep(1);
     } catch (error) {
-      console.error('Error creating gamee:', error);
+      console.error('Error creating game:', error);
       setError(error.message);
     }
   };
@@ -88,7 +88,9 @@ const GameCreator = () => {
       case 1:
         return <BasicInfo gameData={gameData} setGameData={setGameData} />;
       case 2:
-        return <QuestionsAndAnswers gameData={gameData} setGameData={setGameData} />;
+        return (
+          <QuestionsAndAnswers gameData={gameData} setGameData={setGameData} />
+        );
       case 3:
         return <GameSettings gameData={gameData} setGameData={setGameData} />;
       case 4:
@@ -129,7 +131,9 @@ const GameCreator = () => {
         )}
       </div>
       {error && <div className="text-red-500 mt-4">{error}</div>}
-      {success && <div className="text-green-500 mt-4">Game created successfully!</div>}
+      {success && (
+        <div className="text-green-500 mt-4">Game created successfully!</div>
+      )}
     </div>
   );
 };

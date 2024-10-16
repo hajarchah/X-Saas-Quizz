@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import SimpleGame from './GameTypes/SimpleGame';
 import DragAndDropGame from './GameTypes/DragAndDropGame';
 import RightAnswerGame from './GameTypes/RightAnswerGame';
+import ConnectGame from './GameTypes/ConnectGame';
 import ScoreBar from './ScoreBar';
 
 const GamePlayArea = ({
@@ -55,6 +56,14 @@ const GamePlayArea = ({
           <RightAnswerGame
             currentGame={currentGame}
             score={score}
+            setScore={setScore}
+            endGame={endGame}
+          />
+        );
+        case 'connect':
+        return (
+          <ConnectGame
+            currentGame={currentGame}
             setScore={setScore}
             endGame={endGame}
           />

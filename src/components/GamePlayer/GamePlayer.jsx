@@ -8,6 +8,7 @@ import { TouchBackend } from 'react-dnd-touch-backend';
 import PlayerNameInput from './PlayerNameInput';
 import GameSelector from './GameSelector';
 import GamePlayArea from './GamePlayArea';
+import GameCountdown from './GameCountdown';
 
 const GamePlayer = () => {
   const [games, setGames] = useState([]);
@@ -15,6 +16,7 @@ const GamePlayer = () => {
   const [playerName, setPlayerName] = useState('');
   const [gameStarted, setGameStarted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [isCountingDown, setIsCountingDown] = useState(false);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -28,30 +30,48 @@ const GamePlayer = () => {
 
   useEffect(() => {
     let timer;
-    if (currentGame && timeLeft > 0) {
+    if (currentGame && timeLeft > 0 && gameStarted) {
       timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    } else if (timeLeft === 0 && currentGame) {
+    } else if (timeLeft === 0 && currentGame && gameStarted) {
       // Handle game over
     }
     return () => clearTimeout(timer);
-  }, [timeLeft, currentGame]);
+  }, [timeLeft, currentGame, gameStarted]);
 
   const startGame = (game) => {
     setCurrentGame(game);
     setTimeLeft(game.timePerRound);
+    setIsCountingDown(true);
+  };
+
+  const handleCountdownEnd = () => {
+    setIsCountingDown(false);
     setGameStarted(true);
   };
 
+  // Determine if the device is touch-based
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const backend = isMobile ? TouchBackend : HTML5Backend;
+  // Choose the appropriate backend
+  const backendForDND = isTouchDevice ? TouchBackend : HTML5Backend;
 
-  if (!gameStarted) {
-    return <PlayerNameInput playerName={playerName} setPlayerName={setPlayerName} setGameStarted={setGameStarted} />;
+  // Options for touch backend
+  const touchBackendOptions = {
+    enableMouseEvents: true,
+    enableKeyboardEvents: true,
+    enableHoverOutsideTarget: true,
+  };
+
+  if (!playerName) {
+    return <PlayerNameInput setPlayerName={setPlayerName} setGameStarted={setGameStarted} />;
+  }
+
+  if (isCountingDown) {
+    return <GameCountdown onCountdownEnd={handleCountdownEnd} />;
   }
 
   return (
-    <DndProvider backend={backend}>
+    <DndProvider backend={backendForDND} options={isTouchDevice ? touchBackendOptions : undefined}>
       <div className="max-w-md mx-auto">
         {!currentGame ? (
           <GameSelector games={games} startGame={startGame} />

@@ -27,6 +27,7 @@ const BasicInfo = ({ gameData, setGameData }) => {
           <option value="simple">Simple</option>
           <option value="dnd">Drag and Drop</option>
           <option value="rightAnswer">Right Answer</option>
+          <option value="connect">Connect</option>
         </select>
       </div>
     </>
