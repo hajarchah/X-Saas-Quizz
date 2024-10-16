@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useEffect, useState } from 'react';
-import GameCreator from './components/GameCreator';
-import GamePlayer from './components/GamePlayer';
+import GameCreator from './components/GameCreator/GameCreator';
+import GamePlayer from './components/GamePlayer/GamePlayer';
 import { getDownloadURL, getStorage, ref } from 'firebase/storage';
 
 function App() {
@@ -24,7 +24,6 @@ function App() {
   }, []);
 
   return (
-    
     <div style={{
       backgroundImage: `url(${backgroundImageUrl})`,
       backgroundSize: 'cover',
@@ -32,11 +31,11 @@ function App() {
       backgroundRepeat: 'no-repeat',
       minHeight: '100vh',
     }} className="min-h-screen py-3 flex flex-col justify-center sm:py-6 text-black">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto w-full">
-      <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet" />
-      <div className="relative px-4 py-5 bg-gray-100 shadow-lg sm:rounded-3xl sm:p-10">
+      <div className="relative py-3 sm:max-w-xl sm:mx-auto w-full px-4 sm:px-0">
+        <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet" />
+        <div className="relative px-4 py-5 bg-gray-100 shadow-lg sm:rounded-3xl sm:p-10">
           <h1 className="text-2xl font-semibold mb-6 text-center">X-Saas Game Platform</h1>
-          <div className="mb-6 flex justify-center space-x-4">
+          <div className="mb-6 flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4">
             <button
               onClick={() => setActiveComponent('create')}
               className={`px-4 py-2 rounded-md ${activeComponent === 'create' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
