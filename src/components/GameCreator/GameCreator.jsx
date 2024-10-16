@@ -70,7 +70,7 @@ const GameCreator = () => {
       });
       setStep(1);
     } catch (error) {
-      console.error('Error creating game:', error);
+      console.error('Error creating gamee:', error);
       setError(error.message);
     }
   };
